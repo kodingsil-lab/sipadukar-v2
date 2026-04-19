@@ -1727,21 +1727,44 @@ if ($kriteriaActiveId <= 0 && $segment2 === 'kriteria' && $segment3 !== null) {
 
         @media (max-width: 768px) {
             .topbar .container-fluid {
-                position: relative;
-                align-items: flex-start;
-                padding-right: 56px !important;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: start;
+                column-gap: 8px;
+                row-gap: 8px;
             }
 
             .topbar .navbar-toggler {
-                position: absolute;
-                top: 8px;
-                right: 12px;
+                position: static;
                 margin-left: 0;
-                z-index: 5;
+                align-self: start;
             }
 
             .topbar-brand {
-                max-width: calc(100% - 56px);
+                width: 100%;
+                min-width: 0;
+                margin-right: 0;
+                white-space: normal;
+            }
+
+            .navbar-brand-stack {
+                min-width: 0;
+            }
+
+            .topbar .navbar-collapse {
+                grid-column: 1 / -1;
+                width: 100%;
+            }
+
+            .navbar-brand-subtext {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                font-size: 0.6rem;
+                line-height: 1.2;
             }
 
             .hero-dashboard {
