@@ -1726,6 +1726,24 @@ if ($kriteriaActiveId <= 0 && $segment2 === 'kriteria' && $segment3 !== null) {
         }
 
         @media (max-width: 768px) {
+            .topbar .container-fluid {
+                position: relative;
+                align-items: flex-start;
+                padding-right: 56px !important;
+            }
+
+            .topbar .navbar-toggler {
+                position: absolute;
+                top: 8px;
+                right: 12px;
+                margin-left: 0;
+                z-index: 5;
+            }
+
+            .topbar-brand {
+                max-width: calc(100% - 56px);
+            }
+
             .hero-dashboard {
                 padding: 16px;
                 border-radius: 16px;
