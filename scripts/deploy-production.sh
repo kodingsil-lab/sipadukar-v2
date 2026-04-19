@@ -3,11 +3,11 @@
 set -Eeuo pipefail
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DOMAIN_ROOT="${DOMAIN_ROOT:-/home/u541589701/domains/sipadukar.unisap.ac.id}"
-APP_ROOT="${APP_ROOT:-${DOMAIN_ROOT}/sipadukar-app}"
-PUBLIC_ROOT="${PUBLIC_ROOT:-${DOMAIN_ROOT}/public_html}"
-SHARED_ROOT="${SHARED_ROOT:-${DOMAIN_ROOT}/shared}"
-SHARED_ENV="${SHARED_ENV:-${SHARED_ROOT}/.env}"
+DOMAIN_NAME="${DOMAIN_NAME:-sipadukar.demo.sil.web.id}"
+APP_ROOT="${APP_ROOT:-/home/loaunisa/apps/sipadukar/sipadukar-app}"
+PUBLIC_ROOT="${PUBLIC_ROOT:-/home/loaunisa/sipadukar.demo.sil.web.id}"
+SHARED_ENV="${SHARED_ENV:-/home/loaunisa/apps/sipadukar/shared/.env}"
+SHARED_ROOT="${SHARED_ROOT:-$(dirname "${SHARED_ENV}")}"
 PHP_BIN="${PHP_BIN:-php}"
 RUN_MIGRATIONS="${RUN_MIGRATIONS:-1}"
 # Seeder default dimatikan untuk mencegah data duplikat pada deploy rutin.
@@ -175,6 +175,7 @@ log "Mengatur permission folder writable dan uploads"
 chmod -R 775 "${APP_ROOT}/writable" "${PUBLIC_ROOT}/uploads" || true
 
 log "Deploy selesai"
+log "Domain     : ${DOMAIN_NAME}"
 log "App root   : ${APP_ROOT}"
 log "Public root: ${PUBLIC_ROOT}"
 log "Env file   : ${SHARED_ENV}"
