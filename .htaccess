@@ -1,0 +1,26 @@
+Options -Indexes
+
+# Block direct access to sensitive files at project root.
+<FilesMatch "^(\.env|composer\.(json|lock)|phpunit\.xml(\.dist)?|README\.md|CATATAN_PERUBAHAN_PUBLIC\.md|STANDAR_EVENT_AUDIT\.md|scan_xss\.php|spark|preload\.php|LICENSE|\.gitignore|\.gitattributes)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /sipadukar-v2/
+
+    # Deny direct access to hidden paths and non-public application folders.
+    RewriteRule (^|/)\.(?!well-known/) - [F,L,NC]
+    RewriteRule ^(app|writable|vendor|tests|build|builds|env)(/|$) - [F,L,NC]
+
+    RewriteRule ^$ public/ [L]
+
+    RewriteCond %{REQUEST_URI} !^/sipadukar-v2/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /sipadukar-v2/public/index.php
+</IfModule>
