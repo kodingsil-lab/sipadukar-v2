@@ -217,7 +217,7 @@
                                 class="form-control"
                                 id="identity"
                                 name="identity"
-                                value="<?= old('identity'); ?>"
+                                value="<?= esc((string) (old('identity') ?: session()->getFlashdata('old_identity') ?: '')); ?>"
                                 placeholder="Masukkan Username"
                                 required
                             >

@@ -6,6 +6,17 @@ use CodeIgniter\Config\BaseConfig;
 
 class Security extends BaseConfig
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        if ($this->isLocalHost()) {
+            // More forgiving CSRF behavior for local development/testing.
+            $this->regenerate = false;
+            $this->redirect = true;
+        }
+    }
+
     /**
      * --------------------------------------------------------------------------
      * CSRF Protection Method
@@ -83,4 +94,15 @@ class Security extends BaseConfig
      * @see https://codeigniter4.github.io/userguide/libraries/security.html#redirection-on-failure
      */
     public bool $redirect = (ENVIRONMENT === 'production');
+
+    private function isLocalHost(): bool
+    {
+        $configuredBaseUrl = (string) env('app.baseURL', '');
+        $requestHost = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        $detectedHost = $requestHost !== ''
+            ? preg_replace('/:\d+$/', '', $requestHost)
+            : parse_url($configuredBaseUrl, PHP_URL_HOST);
+
+        return in_array(strtolower((string) $detectedHost), ['localhost', '127.0.0.1', '::1'], true);
+    }
 }

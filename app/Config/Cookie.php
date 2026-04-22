@@ -11,6 +11,12 @@ class Cookie extends BaseConfig
     {
         parent::__construct();
 
+        if ($this->isLocalHost()) {
+            // Avoid secure-cookie mismatch on localhost when URL switches between http/https.
+            $this->secure = false;
+            return;
+        }
+
         $configuredBaseUrl = (string) env('app.baseURL', '');
         if ($configuredBaseUrl !== '') {
             $this->secure = strtolower((string) parse_url($configuredBaseUrl, PHP_URL_SCHEME)) === 'https';
@@ -18,6 +24,17 @@ class Cookie extends BaseConfig
             // Fallback: production must use secure cookies even if baseURL is not set.
             $this->secure = true;
         }
+    }
+
+    private function isLocalHost(): bool
+    {
+        $configuredBaseUrl = (string) env('app.baseURL', '');
+        $requestHost = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        $detectedHost = $requestHost !== ''
+            ? preg_replace('/:\d+$/', '', $requestHost)
+            : parse_url($configuredBaseUrl, PHP_URL_HOST);
+
+        return in_array(strtolower((string) $detectedHost), ['localhost', '127.0.0.1', '::1'], true);
     }
 
     /**

@@ -343,7 +343,7 @@ class UserController extends BaseController
         $sheetData->setCellValue('B1', 'NUPTK/NIDN');
         $sheetData->setCellValue('C1', 'Username');
         $sheetData->setCellValue('D1', 'Email (Opsional)');
-        $sheetData->setCellValue('E1', 'Password (Opsional)');
+        $sheetData->setCellValue('E1', 'Password');
         $sheetData->setCellValue('F1', 'Status Akun (Aktif/Nonaktif)');
 
         $sheetData->setCellValue('A2', 'Dosen Contoh');
@@ -375,7 +375,7 @@ class UserController extends BaseController
         $sheetGuide->setCellValue('A3', '1. Isi data pada sheet "Data Import".');
         $sheetGuide->setCellValue('A4', '2. Kolom wajib: Nama Lengkap, NUPTK/NIDN, Username, Status Akun.');
         $sheetGuide->setCellValue('A5', '3. Email opsional. Jika kosong, sistem mengisi otomatis: username@sipadukar.local.');
-        $sheetGuide->setCellValue('A6', '4. Password opsional. Jika kosong, sistem mengisi otomatis: sipadukar123.');
+        $sheetGuide->setCellValue('A6', '4. Password wajib diisi minimal 8 karakter.');
         $sheetGuide->setCellValue('A7', '5. Status Akun wajib: Aktif atau Nonaktif.');
         $sheetGuide->setCellValue('A8', '6. Username dan email harus unik (tidak boleh duplikat).');
         $sheetGuide->setCellValue('A9', '7. User hasil import otomatis memakai role Dosen.');
@@ -458,8 +458,8 @@ class UserController extends BaseController
             }
         }
 
-        if (! $map['nama_lengkap'] || ! $map['nip'] || ! $map['username'] || ! $map['status']) {
-            return redirect()->back()->with('error', 'Kolom wajib (Nama Lengkap, NUPTK/NIDN, Username, Status Akun) tidak ditemukan.');
+        if (! $map['nama_lengkap'] || ! $map['nip'] || ! $map['username'] || ! $map['password'] || ! $map['status']) {
+            return redirect()->back()->with('error', 'Kolom wajib (Nama Lengkap, NUPTK/NIDN, Username, Password, Status Akun) tidak ditemukan.');
         }
 
         $defaultRole = $this->roleModel->where('slug_role', 'dosen')->where('is_aktif', 1)->first();
@@ -487,7 +487,7 @@ class UserController extends BaseController
             $passwordRaw = trim((string) ($row[$map['password']] ?? ''));
             $statusRaw = trim((string) ($row[$map['status']] ?? ''));
 
-            if ($namaLengkap === '' || $nip === '' || $username === '' || $statusRaw === '') {
+            if ($namaLengkap === '' || $nip === '' || $username === '' || $passwordRaw === '' || $statusRaw === '') {
                 $failed++;
                 $failedRows[] = $i . ' (kolom wajib kosong)';
                 continue;
@@ -555,10 +555,10 @@ class UserController extends BaseController
                 continue;
             }
 
-            $password = $passwordRaw !== '' ? $passwordRaw : 'sipadukar123';
-            if (strlen($password) < 6) {
+            $password = $passwordRaw;
+            if (strlen($password) < 8) {
                 $failed++;
-                $failedRows[] = $i . ' (password minimal 6 karakter)';
+                $failedRows[] = $i . ' (password minimal 8 karakter)';
                 continue;
             }
 

@@ -3,6 +3,7 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
+use RuntimeException;
 
 class ProductionAdminSeeder extends Seeder
 {
@@ -41,11 +42,13 @@ class ProductionAdminSeeder extends Seeder
             ->getRowArray();
 
         if (! is_array($adminUser)) {
+            $adminPassword = $this->resolveAdminPassword();
+
             $userTable->insert([
                 'nama_lengkap'   => 'Administrator SIPADUKAR',
                 'username'       => 'admin',
                 'email'          => 'admin@sipadukar.local',
-                'password_hash'  => password_hash('admin123', PASSWORD_DEFAULT),
+                'password_hash'  => password_hash($adminPassword, PASSWORD_DEFAULT),
                 'nip'            => null,
                 'unit_kerja'     => 'LPM',
                 'jabatan'        => 'Administrator',
@@ -82,5 +85,19 @@ class ProductionAdminSeeder extends Seeder
                 'updated_at' => $now,
             ]);
         }
+    }
+
+    private function resolveAdminPassword(): string
+    {
+        $password = trim((string) env('SEED_PRODUCTION_ADMIN_PASSWORD', ''));
+        if ($password === '') {
+            throw new RuntimeException('SEED_PRODUCTION_ADMIN_PASSWORD wajib diisi saat menjalankan ProductionAdminSeeder.');
+        }
+
+        if (strlen($password) < 12) {
+            throw new RuntimeException('SEED_PRODUCTION_ADMIN_PASSWORD minimal 12 karakter.');
+        }
+
+        return $password;
     }
 }

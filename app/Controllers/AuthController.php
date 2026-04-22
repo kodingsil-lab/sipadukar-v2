@@ -27,18 +27,19 @@ class AuthController extends BaseController
     public function prosesLogin()
     {
         $session = session();
+        $identity = trim((string) $this->request->getPost('identity'));
+        $normalizedIdentity = mb_strtolower($identity);
+        $password = (string) $this->request->getPost('password');
+
         $rules = [
             'identity' => 'required|max_length[150]',
             'password' => 'required|min_length[6]|max_length[72]',
         ];
 
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', 'Username/email dan password wajib diisi dengan benar.');
+            return $this->redirectLoginError('Username/email dan password wajib diisi dengan benar.', $identity);
         }
 
-        $identity = trim((string) $this->request->getPost('identity'));
-        $normalizedIdentity = mb_strtolower($identity);
-        $password = (string) $this->request->getPost('password');
         $identityFingerprint = $this->getIdentityFingerprint($normalizedIdentity);
 
         if ($this->isLoginLocked($normalizedIdentity)) {
@@ -48,7 +49,7 @@ class AuthController extends BaseController
                 null,
                 'Percobaan login ditolak karena lockout. identity_fp=' . $identityFingerprint
             );
-            return redirect()->back()->withInput()->with('error', 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.');
+            return $this->redirectLoginError('Terlalu banyak percobaan login. Coba lagi dalam 15 menit.', $identity);
         }
 
         $userModel = new UserModel();
@@ -70,7 +71,7 @@ class AuthController extends BaseController
                 null,
                 'Percobaan login gagal. identity_fp=' . $identityFingerprint
             );
-            return redirect()->back()->withInput()->with('error', 'Username/email atau password salah.');
+            return $this->redirectLoginError('Username/email atau password salah.', $identity);
         }
 
         if (! password_verify($password, $user['password_hash'])) {
@@ -81,7 +82,7 @@ class AuthController extends BaseController
                 (int) ($user['id'] ?? 0),
                 'Percobaan login gagal. identity_fp=' . $identityFingerprint
             );
-            return redirect()->back()->withInput()->with('error', 'Username/email atau password salah.');
+            return $this->redirectLoginError('Username/email atau password salah.', $identity);
         }
 
         $ipAttemptsBeforeClear = $this->getAttemptCount($this->getIpAttemptKey());
@@ -213,5 +214,13 @@ class AuthController extends BaseController
     {
         Services::cache()->delete($this->getIpAttemptKey());
         Services::cache()->delete($this->getIdentityAttemptKey($identity));
+    }
+
+    private function redirectLoginError(string $message, string $identity)
+    {
+        return redirect()
+            ->back()
+            ->with('error', $message)
+            ->with('old_identity', $identity);
     }
 }

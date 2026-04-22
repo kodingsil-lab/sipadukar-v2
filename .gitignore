@@ -60,6 +60,10 @@ Vagrantfile
 /writable/uploads/*
 !/writable/uploads/index.html
 
+/public/writable/*
+!/public/writable/.htaccess
+!/public/writable/index.html
+
 /writable/debugbar/*
 !/writable/debugbar/index.html
 
